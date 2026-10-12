@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سوقنا | سوقك المحلي، وين ما كنت</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts (Cairo & Tajawal) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Firebase Compatibility Libraries -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    * {
+      font-family: 'Cairo', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 4px;
+    }
+    .badge-pulse {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulse-green 2s infinite;
+    }
+    @keyframes pulse-green {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
+
+  <!-- TOP NOTICE BAR / STATUS -->
+  <div id="connectionBar" class="bg-emerald-950 text-emerald-200 text-xs py-1.5 px-4 text-center flex items-center justify-center gap-2 border-b border-emerald-800">
+    <span class="w-2 h-2 rounded-full bg-emerald-400 badge-pulse"></span>
+    <span id="connectionStatusText">متصل بقاعدة البيانات السحابية الحقيقية (Souqna Web Live)</span>
+  </div>
+
+  <!-- HEADER / NAVBAR -->
+  <header class="bg-emerald-700 text-white shadow-lg sticky top-0 z-40 border-b border-emerald-800">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+      
+      <!-- LOGO -->
+      <a href="#" onclick="navigateTo('home')" class="flex items-center gap-2 group">
+        <div class="bg-white text-emerald-700 font-black text-2xl px-3 py-1 rounded-xl shadow-md group-hover:scale-105 transition-transform">
+          سوقنا
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs md:text-sm font-bold text-amber-300 leading-none">القصير وريفها</span>
+          <span class="text-[10px] text-emerald-100 hidden sm:inline">سوقك المحلي، وين ما كنت</span>
+        </div>
+      </a>
+
+      <!-- USER NAV CONTROLS -->
+      <div id="guestNav" class="flex items-center gap-2">
+        <button onclick="navigateTo('login')" class="text-xs md:text-sm bg-emerald-800 hover:bg-emerald-900 text-white px-3 py-2 rounded-xl font-semibold border border-emerald-600 transition">
+          دخول صاحب محل
+        </button>
+        <button onclick="navigateTo('register')" class="text-xs md:text-sm bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold px-3 py-2 rounded-xl shadow-md transition">
+          سجل محلك مجاناً
+        </button>
+      </div>
+
+      <!-- LOGGED IN USER NAV -->
+      <div id="userNav" class="hidden flex items-center gap-2">
+        <div class="text-right hidden sm:block">
+          <div id="navShopTitle" class="text-xs font-bold text-amber-300 leading-tight"></div>
+          <div id="navShopRole" class="text-[10px] text-emerald-200">صاحب محل</div>
+        </div>
+        <button onclick="navigateTo('dashboard')" class="text-xs md:text-sm bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-3 py-2 rounded-xl transition">
+          لوحة المحل 🏪
+        </button>
+        <button onclick="logout()" class="text-xs bg-red-600 hover:bg-red-700 text-white px-2.5 py-2 rounded-xl transition">
+          خروج
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-6xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+
+    <!-- VIEW 1: HOME PAGE (VISITORS) -->
+    <section id="homeView" class="space-y-6">
+      
+      <!-- HERO BANNER -->
+      <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 rounded-2xl p-6 text-white shadow-sm relative overflow-hidden">
+        <div class="relative z-10 space-y-2 max-w-2xl">
+          <span class="bg-amber-400 text-slate-900 text-[11px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">المنصة الأولى في حمص</span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white">دليلك الكامل لمحلات ومنتجات القصير وريفها</h1>
+          <p class="text-emerald-100 text-xs sm:text-sm">تصفح الأسعار، تواصل مع أصحاب المحلات مباشر عبر الواتساب أو الهاتف، ودعم تجار مدينتك وقريتك.</p>
+        </div>
+      </div>
+
+      <!-- SEARCH & FILTER BAR -->
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3 md:space-y-0 md:flex md:items-center md:gap-3">
+        
+        <!-- Search Input -->
+        <div class="relative flex-1">
+          <span class="absolute inset-y-0 right-3 flex items-center text-slate-400">🔍</span>
+          <input type="text" id="searchInput" oninput="applyFilters()" placeholder="ابحث عن منتج، مادة غذائية، أو اسم محل..." 
+                 class="w-full pr-10 pl-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:outline-none transition">
+        </div>
+
+        <!-- Region Selector -->
+        <div class="w-full md:w-48">
+          <select id="regionFilter" onchange="applyFilters()" class="w-full py-2.5 px-3 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            <option value="">جميع القرى والمناطق</option>
+            <option value="القصير المدينة">القصير المدينة</option>
+            <option value="ربلة">ربلة</option>
+            <option value="الجوسية">الجوسية</option>
+            <option value="النزارية">النزارية</option>
+            <option value="زراعة">زراعة</option>
+            <option value="القبو">القبو</option>
+            <option value="الغسانية">الغسانية</option>
+            <option value="أبل">أبل</option>
+            <option value="الضبعة">الضبعة</option>
+          </select>
+        </div>
+
+        <!-- Category Selector -->
+        <div class="w-full md:w-56">
+          <select id="categoryFilter" onchange="applyFilters()" class="w-full py-2.5 px-3 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            <option value="">جميع الأقسام</option>
+            <option value="المواد الغذائية والسوبرماركت">المواد الغذائية والسوبرماركت</option>
+            <option value="الألبان والأجبان">الألبان والأجبان</option>
+            <option value="الخضار والفواكه">الخضار والفواكه</option>
+            <option value="الملابس والأحذية">الملابس والأحذية</option>
+            <option value="الأجهزة والإلكترونيات">الأجهزة والإلكترونيات</option>
+            <option value="الأدوات المنزلية">الأدوات المنزلية</option>
+            <option value="مستلزمات الزراعة">مستلزمات الزراعة</option>
+            <option value="خدمات محلية">خدمات محلية متنوعة</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- PRODUCTS HEADER & STATS -->
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <span>🛒</span> المنتجات والأنشطة التجارية
+        </h2>
+        <span id="productCounter" class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full">جاري التحميل...</span>
+      </div>
+
+      <!-- PRODUCTS GRID -->
+      <div id="productsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- VIEW 2: LOGIN FORM -->
+    <section id="loginView" class="hidden max-w-md mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
+      <div class="text-center space-y-1 mb-6">
+        <h2 class="text-xl font-extrabold text-slate-900">تسجيل الدخول للمحل</h2>
+        <p class="text-xs text-slate-500">أدخل بريدك وكلمة المرور للوصول لإدارة منتجاتك</p>
+      </div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني</label>
+          <input type="email" id="loginEmail" required class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">كلمة المرور</label>
+          <input type="password" id="loginPassword" required class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+        <button type="submit" id="btnLoginSubmit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-xl transition shadow-md">
+          دخول الحساب
+        </button>
+      </form>
+
+      <div class="mt-6 text-center text-xs text-slate-500">
+        ليس لديك حساب محلي بعد؟ 
+        <button onclick="navigateTo('register')" class="text-emerald-700 font-bold hover:underline">أنشئ متجرك مجاناً</button>
+      </div>
+    </section>
+
+    <!-- VIEW 3: REGISTER NEW SHOP -->
+    <section id="registerView" class="hidden max-w-lg mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
+      <div class="text-center space-y-1 mb-6">
+        <h2 class="text-xl font-extrabold text-slate-900">تسجيل محل تجاري جديد</h2>
+        <p class="text-xs text-slate-500">انضم إلى سوق القصير وريفها وابدأ بعرض منتجاتك للجميع</p>
+      </div>
+
+      <form onsubmit="handleRegister(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">اسم المحل / المتجر *</label>
+          <input type="text" id="regShopName" required placeholder="مثال: سوبرماركت البركة، ألبان الجوسية..." class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">القرية / المنطقة *</label>
+            <select id="regRegion" required class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <option value="القصير المدينة">القصير المدينة</option>
+              <option value="ربلة">ربلة</option>
+              <option value="الجوسية">الجوسية</option>
+              <option value="النزارية">النزارية</option>
+              <option value="زراعة">زراعة</option>
+              <option value="القبو">القبو</option>
+              <option value="الغسانية">الغسانية</option>
+              <option value="أبل">أبل</option>
+              <option value="الضبعة">الضبعة</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">رقم الواتساب للتواصل *</label>
+            <input type="tel" id="regPhone" required placeholder="09xxxxxxx" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني *</label>
+          <input type="email" id="regEmail" required placeholder="example@domain.com" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">كلمة المرور (6 أحرف/أرقام على الأقل) *</label>
+          <input type="password" id="regPassword" required minlength="6" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <button type="submit" id="btnRegisterSubmit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold py-3 rounded-xl transition shadow-md">
+          تأكيد وإنشاء المتجر
+        </button>
+      </form>
+    </section>
+
+    <!-- VIEW 4: VENDOR DASHBOARD -->
+    <section id="dashboardView" class="hidden space-y-6">
+      
+      <!-- SHOP PROFILE INFO CARD -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <h2 id="dashShopName" class="text-xl font-extrabold text-slate-900">...</h2>
+            <span id="dashShopRegion" class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full"></span>
+          </div>
+          <p id="dashShopPhone" class="text-xs text-slate-500"></p>
+        </div>
+
+        <button onclick="openAddProductModal()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition shadow-sm flex items-center justify-center gap-2">
+          <span>➕</span> إضافة منتج جديد
+        </button>
+      </div>
+
+      <!-- MY PRODUCTS TABLE/GRID -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+        <h3 class="font-bold text-slate-900 text-sm border-b pb-2">منتجات متجري المنشورة حالياً</h3>
+        <div id="vendorProductsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ADD PRODUCT MODAL -->
+  <div id="addProductModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl border border-slate-100">
+      
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="font-extrabold text-slate-900 text-base">إضافة منتج إلى متجرك</h3>
+        <button onclick="closeAddProductModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+      </div>
+
+      <form onsubmit="handleSaveProduct(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">اسم المنتج *</label>
+          <input type="text" id="prodTitle" required placeholder="مثال: زبل بلدي، لبن غنم، طماطم طازجة..." class="w-full px-3 py-2 text-sm bg-slate-50 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">السعر (ل.س) *</label>
+            <input type="number" id="prodPrice" required placeholder="25000" class="w-full px-3 py-2 text-sm bg-slate-50 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">القسم *</label>
+            <select id="prodCategory" required class="w-full px-3 py-2 text-sm bg-slate-50 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <option value="المواد الغذائية والسوبرماركت">المواد الغذائية والسوبرماركت</option>
+              <option value="الألبان والأجبان">الألبان والأجبان</option>
+              <option value="الخضار والفواكه">الخضار والفواكه</option>
+              <option value="الملابس والأحذية">الملابس والأحذية</option>
+              <option value="الأجهزة والإلكترونيات">الأجهزة والإلكترونيات</option>
+              <option value="الأدوات المنزلية">الأدوات المنزلية</option>
+              <option value="مستلزمات الزراعة">مستلزمات الزراعة</option>
+              <option value="خدمات محلية">خدمات محلية</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">رابط صورة المنتج (اختياري)</label>
+          <input type="url" id="prodImage" placeholder="https://..." class="w-full px-3 py-2 text-sm bg-slate-50 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">وصف قصير</label>
+          <textarea id="prodDesc" rows="2" placeholder="تفاصيل المنتج والوزن أو حالة التوفر..." class="w-full px-3 py-2 text-sm bg-slate-50 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeAddProductModal()" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200">إلغاء</button>
+          <button type="submit" id="btnSaveProd" class="px-4 py-2 bg-emerald-700 text-white text-xs font-bold rounded-xl hover:bg-emerald-800 shadow-md">نشر للمشترين</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-900 text-slate-400 text-xs py-6 mt-10 border-t border-slate-800">
+    <div class="max-w-6xl mx-auto px-4 text-center space-y-2">
+      <p class="font-bold text-slate-200">سوقنا - المنصة الأولى المخصصة لخدمة أهالي وتجار القصير وريفها</p>
+      <p>© 2026 جميع الحقوق محفوظة | يعمل بتقنية السحاب والتزامن اللحظي</p>
+    </div>
+  </footer>
+
+  <!-- APPLICATION LOGIC & FIREBASE INITIALIZATION -->
+  <script>
+    // 1. FIREBASE CONFIGURATION (YOUR REAL LIVE PROJECT KEYS)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAm54wUGpO38iH2fcfopan-Mtb4a71_CY0",
+      authDomain: "souqna-76bed.firebaseapp.com",
+      projectId: "souqna-76bed",
+      storageBucket: "souqna-76bed.firebasestorage.app",
+      messagingSenderId: "615964030772",
+      appId: "1:615964030772:web:cc3219d83279d422e71761",
+      measurementId: "G-EP7QTEYFVE"
+    };
+
+    // Initialize Firebase Services
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Global State
+    let currentUser = null;
+    let currentShop = null;
+    let publicProducts = [];
+
+    // NAVIGATION CONTROLLER
+    function navigateTo(viewId) {
+      const views = ['homeView', 'loginView', 'registerView', 'dashboardView'];
+      views.forEach(v => document.getElementById(v).classList.add('hidden'));
+      document.getElementById(viewId + 'View').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // AUTHENTICATION LISTENER
+    auth.onAuthStateChanged(async (user) => {
+      currentUser = user;
+      const guestNav = document.getElementById('guestNav');
+      const userNav = document.getElementById('userNav');
+
+      if (user) {
+        guestNav.classList.add('hidden');
+        userNav.classList.remove('hidden');
+
+        try {
+          const shopDoc = await db.collection('shops').doc(user.uid).get();
+          if (shopDoc.exists) {
+            currentShop = { id: shopDoc.id, ...shopDoc.data() };
+            document.getElementById('navShopTitle').innerText = currentShop.name;
+            document.getElementById('dashShopName').innerText = currentShop.name;
+            document.getElementById('dashShopRegion').innerText = currentShop.region;
+            document.getElementById('dashShopPhone').innerText = `هاتف التواصل: ${currentShop.phone}`;
+            loadVendorProducts();
+          }
+        } catch (err) {
+          console.error("Error fetching shop data:", err);
+        }
+      } else {
+        guestNav.classList.remove('hidden');
+        userNav.classList.add('hidden');
+        currentShop = null;
+      }
+    });
+
+    // REAL-TIME LISTENER FOR PUBLIC PRODUCTS
+    db.collection('products').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+      publicProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      applyFilters();
+    }, error => {
+      console.warn("Firestore live index falling back:", error);
+      // Fallback query without sorting if index is building
+      db.collection('products').get().then(snap => {
+        publicProducts = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        applyFilters();
+      });
+    });
+
+    // FILTER & SEARCH PRODUCTS FOR VISITORS
+    function applyFilters() {
+      const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+      const regionVal = document.getElementById('regionFilter').value;
+      const categoryVal = document.getElementById('categoryFilter').value;
+
+      const filtered = publicProducts.filter(p => {
+        const matchesSearch = !searchVal || 
+          (p.title && p.title.toLowerCase().includes(searchVal)) || 
+          (p.shopName && p.shopName.toLowerCase().includes(searchVal));
+        const matchesRegion = !regionVal || p.region === regionVal;
+        const matchesCategory = !categoryVal || p.category === categoryVal;
+        return matchesSearch && matchesRegion && matchesCategory;
+      });
+
+      renderProducts(filtered);
+    }
+
+    // RENDER PRODUCTS GRID
+    function renderProducts(items) {
+      const grid = document.getElementById('productsGrid');
+      const counter = document.getElementById('productCounter');
+      counter.innerText = `${items.length} منتج متوفر`;
+
+      if (items.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full bg-white p-8 rounded-2xl text-center space-y-2 border">
+            <div class="text-3xl">🌾</div>
+            <p class="font-bold text-slate-700">لا توجد منتجات مطابقة لخيارات البحث حالياً.</p>
+            <p class="text-xs text-slate-400">جرب اختيار قرية أخرى أو تغيير كلمة البحث.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = items.map(item => `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition">
+          <div>
+            <div class="h-36 bg-slate-100 overflow-hidden relative">
+              <img src="${item.image || 'https://via.placeholder.com/300x200?text=سوقنا'}" 
+                   alt="${item.title}" class="w-full h-full object-cover">
+              <span class="absolute top-2 right-2 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                ${item.region || 'القصير'}
+              </span>
+            </div>
+            
+            <div class="p-3 space-y-1">
+              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+                ${item.category || 'عام'}
+              </span>
+              <h3 class="font-bold text-slate-900 text-sm line-clamp-1 mt-1">${item.title}</h3>
+              <p class="text-xs text-slate-500 font-semibold">🏪 ${item.shopName || 'محل محلي'}</p>
+              ${item.desc ? `<p class="text-[11px] text-slate-400 line-clamp-2">${item.desc}</p>` : ''}
+            </div>
+          </div>
+
+          <div class="p-3 pt-0 space-y-2">
+            <div class="text-emerald-700 font-black text-sm">
+              ${Number(item.price).toLocaleString()} <span class="text-[10px]">ل.س</span>
+            </div>
+            <a href="https://wa.me/963${(item.phone || '').replace(/^0/, '')}?text=${encodeURIComponent('مرحباً، أريد الاستفسار عن منتجك في سوقنا: ' + item.title)}" 
+               target="_blank" 
+               class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-xl flex items-center justify-center gap-1 transition">
+              💬 تواصل واتساب
+            </a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // REGISTER HANDLER
+    async function handleRegister(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnRegisterSubmit');
+      btn.disabled = true;
+      btn.innerText = 'جاري تسجيل المتجر...';
+
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const shopName = document.getElementById('regShopName').value.trim();
+      const region = document.getElementById('regRegion').value;
+      const phone = document.getElementById('regPhone').value.trim();
+
+      try {
+        const cred = await auth.createUserWithEmailAndPassword(email, password);
+        await db.collection('shops').doc(cred.user.uid).set({
+          ownerId: cred.user.uid,
+          name: shopName,
+          region: region,
+          phone: phone,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert('تم إنشاء متجرك بنجاح في قاعدة البيانات السحابية!');
+        navigateTo('dashboard');
+      } catch (err) {
+        alert('خطأ في التسجيل: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'تأكيد وإنشاء المتجر';
+      }
+    }
+
+    // LOGIN HANDLER
+    async function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnLoginSubmit');
+      btn.disabled = true;
+      btn.innerText = 'جاري التحقق...';
+
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        navigateTo('dashboard');
+      } catch (err) {
+        alert('خطأ تسجيل الدخول: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'دخول الحساب';
+      }
+    }
+
+    // LOGOUT
+    function logout() {
+      auth.signOut();
+      navigateTo('home');
+    }
+
+    // VENDOR PRODUCTS LOADER
+    function loadVendorProducts() {
+      if (!currentUser) return;
+      db.collection('products').where('ownerId', '==', currentUser.uid).onSnapshot(snap => {
+        const vGrid = document.getElementById('vendorProductsGrid');
+        if (snap.empty) {
+          vGrid.innerHTML = `<p class="col-span-full text-center text-slate-400 py-6 text-xs">لم تقم بإضافة أي منتجات لمتجرك بعد.</p>`;
+          return;
+        }
+
+        vGrid.innerHTML = snap.docs.map(doc => {
+          const item = doc.data();
+          return `
+            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 flex items-center justify-between gap-2">
+              <div>
+                <h4 class="font-bold text-slate-900 text-xs">${item.title}</h4>
+                <p class="text-xs text-emerald-700 font-extrabold">${Number(item.price).toLocaleString()} ل.س</p>
+              </div>
+              <button onclick="deleteProduct('${doc.id}')" class="text-red-600 hover:bg-red-100 p-1.5 rounded-lg text-xs font-bold transition">
+                حذف 🗑️
+              </button>
+            </div>
+          `;
+        }).join('');
+      });
+    }
+
+    // MODAL CONTROLS
+    function openAddProductModal() { document.getElementById('addProductModal').classList.remove('hidden'); }
+    function closeAddProductModal() { document.getElementById('addProductModal').classList.add('hidden'); }
+
+    // SAVE PRODUCT
+    async function handleSaveProduct(e) {
+      e.preventDefault();
+      if (!currentShop) return alert('خطأ: يتعذر العثور على بيانات متجرك');
+
+      const btn = document.getElementById('btnSaveProd');
+      btn.disabled = true;
+      btn.innerText = 'جاري النشر...';
+
+      const title = document.getElementById('prodTitle').value.trim();
+      const price = Number(document.getElementById('prodPrice').value);
+      const category = document.getElementById('prodCategory').value;
+      const image = document.getElementById('prodImage').value.trim();
+      const desc = document.getElementById('prodDesc').value.trim();
+
+      try {
+        await db.collection('products').add({
+          ownerId: currentUser.uid,
+          shopId: currentShop.id,
+          shopName: currentShop.name,
+          region: currentShop.region,
+          phone: currentShop.phone,
+          title, price, category, image, desc,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        closeAddProductModal();
+        document.getElementById('prodTitle').value = '';
+        document.getElementById('prodPrice').value = '';
+        document.getElementById('prodDesc').value = '';
+        alert('تم نشر المنتج بنجاح وظهر لجميع زوار موقع سوقنا!');
+      } catch (err) {
+        alert('حدث خطأ أثناء حفظ المنتج: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'نشر للمشترين';
+      }
+    }
+
+    // DELETE PRODUCT
+    async function deleteProduct(id) {
+      if (confirm('هل أنت تأكد من إزالة هذا المنتج من متجرك؟')) {
+        try {
+          await db.collection('products').doc(id).delete();
+        } catch (err) {
+          alert('خطأ في الحذف: ' + err.message);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
