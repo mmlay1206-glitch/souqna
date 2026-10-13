@@ -519,33 +519,50 @@
           const password = document.getElementById('regPassword').value;
           const cred = await auth.createUserWithEmailAndPassword(email, password);
           userId = cred.user.uid;
-        }
-
-        await db.collection('shops').doc(userId).set({
-          ownerId: userId,
-          name: shopName,
-          region: region,
-          phone: phone,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-
-        alert('تم حفظ وترابط متجرك بنجاح في قاعدة البيانات السحابية!');
         
-        // إعادة تهيئة الحقول للوضع الطبيعي
-        const emailPassDiv = document.getElementById('emailPasswordFields');
-        if (emailPassDiv) emailPassDiv.style.display = 'block';
-        document.getElementById('regEmail').setAttribute('required', 'true');
-        document.getElementById('regPassword').setAttribute('required', 'true');
-        
-        navigateTo('dashboard');
-      } catch (err) {
-        alert('خطأ في التسجيل: ' + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = 'تأكيد وإنشاء المتجر';
-      }
+async function handleLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnLoginSubmit');
+  btn.disabled = true;
+  btn.innerText = 'جاري التحقق...';
+
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  try {
+    const cred = await auth.signInWithEmailAndPassword(email, password);
+    const user = cred.user;
+    const shopDoc = await db.collection('shops').doc(user.uid).get();
+
+    if (!shopDoc.exists) {
+      currentUser = user;
+      currentShop = null;
+      alert('تم الدخول، لكن المتجر غير مرتبط بهذا الحساب. سنحتاج إلى إصلاح الربط.');
+      navigateTo('register');
+      return;
     }
 
+    currentUser = user;
+    currentShop = { id: shopDoc.id, ...shopDoc.data() };
+
+    document.getElementById('navShopTitle').innerText = currentShop.name || 'متجري';
+    document.getElementById('dashShopName').innerText = currentShop.name || 'متجري';
+    document.getElementById('dashShopRegion').innerText = currentShop.region || '';
+    document.getElementById('dashShopPhone').innerText =
+      `هاتف التواصل: ${currentShop.phone || ''}`;
+
+    document.getElementById('guestNav').classList.add('hidden');
+    document.getElementById('userNav').classList.remove('hidden');
+
+    loadVendorProducts();
+    navigateTo('dashboard');
+  } catch (err) {
+    alert('تعذر الدخول أو تحميل المتجر: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerText = 'دخول الحساب';
+  }
+}
     // LOGIN HANDLER
     async function handleLogin(e) {
       e.preventDefault();
