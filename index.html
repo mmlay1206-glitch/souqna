@@ -587,7 +587,7 @@
       }
     }
 
-    // REGISTER HANDLER (Updates state & navigates smoothly)
+    // REGISTER HANDLER (Updates state & handles existing account detection)
     async function handleRegister(e) {
       e.preventDefault();
       const btn = document.getElementById('btnRegisterSubmit');
@@ -604,9 +604,23 @@
         if (!user) {
           const email = document.getElementById('regEmail').value.trim();
           const password = document.getElementById('regPassword').value;
-          const cred = await auth.createUserWithEmailAndPassword(email, password);
-          user = cred.user;
-          currentUser = user;
+
+          try {
+            const cred = await auth.createUserWithEmailAndPassword(email, password);
+            user = cred.user;
+            currentUser = user;
+          } catch (createErr) {
+            if (createErr.code === 'auth/email-already-in-use') {
+              alert('هذا البريد الإلكتروني مسجل لدينا بالفعل!\nسنتوجه بك الآن إلى صفحة "دخول صاحب محل" لتسجيل الدخول بحسابك القديم.');
+              document.getElementById('loginEmail').value = email;
+              navigateTo('login');
+              btn.disabled = false;
+              btn.innerText = 'تأكيد وإنشاء المتجر';
+              return;
+            } else {
+              throw createErr;
+            }
+          }
         }
 
         const newShopData = {
