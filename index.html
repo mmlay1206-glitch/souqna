@@ -54,7 +54,7 @@
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
       
       <!-- LOGO -->
-      <a href="#" onclick="navigateTo('home')" class="flex items-center gap-2 group">
+      <a href="index.html" class="flex items-center gap-2 group">
         <div class="bg-white text-emerald-700 font-black text-2xl px-3 py-1 rounded-xl shadow-md group-hover:scale-105 transition-transform">
           سوقنا
         </div>
@@ -64,28 +64,11 @@
         </div>
       </a>
 
-      <!-- USER NAV CONTROLS -->
-      <div id="guestNav" class="flex items-center gap-2">
-        <button onclick="navigateTo('login')" class="text-xs md:text-sm bg-emerald-800 hover:bg-emerald-900 text-white px-3 py-2 rounded-xl font-semibold border border-emerald-600 transition">
-          دخول صاحب محل
-        </button>
-        <button onclick="navigateTo('register')" class="text-xs md:text-sm bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold px-3 py-2 rounded-xl shadow-md transition">
-          سجل محلك مجاناً
-        </button>
-      </div>
-
-      <!-- LOGGED IN USER NAV -->
-      <div id="userNav" class="hidden flex items-center gap-2">
-        <div class="text-right hidden sm:block">
-          <div id="navShopTitle" class="text-xs font-bold text-amber-300 leading-tight">متجري</div>
-          <div id="navShopRole" class="text-[10px] text-emerald-200">صاحب محل</div>
-        </div>
-        <button onclick="openVendorDashboard()" class="text-xs md:text-sm bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-3 py-2 rounded-xl transition">
-          لوحة المحل 🏪
-        </button>
-        <button onclick="logout()" class="text-xs bg-red-600 hover:bg-red-700 text-white px-2.5 py-2 rounded-xl transition">
-          خروج
-        </button>
+      <!-- ADMIN / SHOP CONTROLS (Redirects securely to admin.html) -->
+      <div class="flex items-center gap-2">
+        <a href="admin.html" class="text-xs md:text-sm bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold px-3.5 py-2 rounded-xl shadow-md transition flex items-center gap-1">
+          <span>🏪</span> لوحة المحل / النشر
+        </a>
       </div>
     </div>
   </header>
@@ -93,7 +76,7 @@
   <!-- MAIN CONTAINER -->
   <main class="max-w-6xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
 
-    <!-- VIEW 1: HOME PAGE (VISITORS) -->
+    <!-- HOME PAGE (VISITORS VIEW) -->
     <section id="homeView" class="space-y-6">
       
       <!-- HERO BANNER -->
@@ -101,7 +84,7 @@
         <div class="relative z-10 space-y-2 max-w-2xl">
           <span class="bg-amber-400 text-slate-900 text-[11px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">المنصة الأولى في حمص</span>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-white">دليلك الكامل لمحلات ومنتجات القصير وريفها</h1>
-          <p class="text-emerald-100 text-xs sm:text-sm">تصفح الأسعار، تواصل مع أصحاب المحلات مباشر عبر الواتساب أو الهاتف، ودعم تجار مدينتك وقريتك.</p>
+          <p class="text-emerald-100 text-xs sm:text-sm">تصفح الأسعار، تواصل مع أصحاب المحلات مباشرة عبر الواتساب أو الهاتف، ودعم تجار مدينتك وقريتك.</p>
         </div>
       </div>
 
@@ -161,167 +144,7 @@
       </div>
     </section>
 
-    <!-- VIEW 2: LOGIN FORM -->
-    <section id="loginView" class="hidden max-w-md mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
-      <div class="text-center space-y-1 mb-6">
-        <h2 class="text-xl font-extrabold text-slate-900">تسجيل الدخول للمحل</h2>
-        <p class="text-xs text-slate-500">أدخل بريدك وكلمة المرور للوصول لإدارة منتجاتك</p>
-      </div>
-
-      <form onsubmit="handleLogin(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني</label>
-          <input type="email" id="loginEmail" required class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">كلمة المرور</label>
-          <input type="password" id="loginPassword" required class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-        </div>
-        <button type="submit" id="btnLoginSubmit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-xl transition shadow-md">
-          دخول الحساب
-        </button>
-      </form>
-
-      <div class="mt-6 text-center text-xs text-slate-500">
-        ليس لديك حساب محلي بعد؟ 
-        <button onclick="navigateTo('register')" class="text-emerald-700 font-bold hover:underline">أنشئ متجرك مجاناً</button>
-      </div>
-    </section>
-
-    <!-- VIEW 3: REGISTER NEW SHOP -->
-    <section id="registerView" class="hidden max-w-lg mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
-      <div class="text-center space-y-1 mb-6">
-        <h2 id="registerTitleText" class="text-xl font-extrabold text-slate-900">تسجيل محل تجاري جديد</h2>
-        <p id="registerSubText" class="text-xs text-slate-500">انضم إلى سوق القصير وريفها وابدأ بعرض منتجاتك للجميع</p>
-      </div>
-
-      <form onsubmit="handleRegister(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">اسم المحل / المتجر *</label>
-          <input type="text" id="regShopName" required placeholder="مثال: سوبرماركت البركة..." class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">القرية / المنطقة *</label>
-            <select id="regRegion" required class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-              <option value="القصير المدينة">القصير المدينة</option>
-              <option value="ربلة">ربلة</option>
-              <option value="الجوسية">الجوسية</option>
-              <option value="النزارية">النزارية</option>
-              <option value="زراعة">زراعة</option>
-              <option value="القبو">القبو</option>
-              <option value="الغسانية">الغسانية</option>
-              <option value="أبل">أبل</option>
-              <option value="الضبعة">الضبعة</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">رقم الواتساب للتواصل *</label>
-            <input type="tel" id="regPhone" required placeholder="09xxxxxxx" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-          </div>
-        </div>
-
-        <div id="emailPasswordFields">
-          <div class="mb-4">
-            <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني *</label>
-            <input type="email" id="regEmail" placeholder="example@domain.com" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">كلمة المرور (6 أحرف/أرقام على الأقل) *</label>
-            <input type="password" id="regPassword" minlength="6" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-          </div>
-        </div>
-
-        <button type="submit" id="btnRegisterSubmit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold py-3 rounded-xl transition shadow-md">
-          تأكيد وإنشاء المتجر
-        </button>
-      </form>
-    </section>
-
-    <!-- VIEW 4: VENDOR DASHBOARD -->
-    <section id="dashboardView" class="hidden space-y-6">
-      
-      <!-- SHOP PROFILE INFO CARD -->
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div class="space-y-1">
-          <div class="flex items-center gap-2">
-            <h2 id="dashShopName" class="text-xl font-extrabold text-slate-900">...</h2>
-            <span id="dashShopRegion" class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full"></span>
-          </div>
-          <p id="dashShopPhone" class="text-xs text-slate-500"></p>
-        </div>
-
-        <button onclick="openAddProductModal()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition shadow-sm flex items-center justify-center gap-2">
-          <span>➕</span> إضافة منتج جديد
-        </button>
-      </div>
-
-      <!-- MY PRODUCTS TABLE/GRID -->
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-        <h3 class="font-bold text-slate-900 text-sm border-b pb-2">منتجات متجري المنشورة حالياً</h3>
-        <div id="vendorProductsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <!-- Rendered via JS -->
-        </div>
-      </div>
-    </section>
-
   </main>
-
-  <!-- ADD PRODUCT MODAL -->
-  <div id="addProductModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl border border-slate-100">
-      
-      <div class="flex items-center justify-between border-b pb-3">
-        <h3 class="font-extrabold text-slate-900 text-base">إضافة منتج إلى متجرك</h3>
-        <button onclick="closeAddProductModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
-      </div>
-
-      <form onsubmit="handleSaveProduct(event)" class="space-y-3">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">اسم المنتج *</label>
-          <input type="text" id="prodTitle" required placeholder="مثال: زبل بلدي، لبن غنم..." class="w-full px-3 py-2 text-sm bg-slate-50 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">السعر (ل.س) *</label>
-            <input type="number" id="prodPrice" required placeholder="25000" class="w-full px-3 py-2 text-sm bg-slate-50 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">القسم *</label>
-            <select id="prodCategory" required class="w-full px-3 py-2 text-sm bg-slate-50 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-              <option value="المواد الغذائية والسوبرماركت">المواد الغذائية والسوبرماركت</option>
-              <option value="الألبان والأجبان">الألبان والأجبان</option>
-              <option value="الخضار والفواكه">الخضار والفواكه</option>
-              <option value="الملابس والأحذية">الملابس والأحذية</option>
-              <option value="الأجهزة والإلكترونيات">الأجهزة والإلكترونيات</option>
-              <option value="الأدوات المنزلية">الأدوات المنزلية</option>
-              <option value="مستلزمات الزراعة">مستلزمات الزراعة</option>
-              <option value="خدمات محلية">خدمات محلية</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">رابط صورة المنتج (اختياري)</label>
-          <input type="url" id="prodImage" placeholder="https://..." class="w-full px-3 py-2 text-sm bg-slate-50 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">وصف قصير</label>
-          <textarea id="prodDesc" rows="2" placeholder="تفاصيل المنتج والوزن..." class="w-full px-3 py-2 text-sm bg-slate-50 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"></textarea>
-        </div>
-
-        <div class="flex justify-end gap-2 pt-2 border-t">
-          <button type="button" onclick="closeAddProductModal()" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200">إلغاء</button>
-          <button type="submit" id="btnSaveProd" class="px-4 py-2 bg-emerald-700 text-white text-xs font-bold rounded-xl hover:bg-emerald-800 shadow-md">نشر للمشترين</button>
-        </div>
-      </form>
-    </div>
-  </div>
 
   <!-- FOOTER -->
   <footer class="bg-slate-900 text-slate-400 text-xs py-6 mt-10 border-t border-slate-800">
@@ -348,92 +171,9 @@
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-    const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Global State
-    let currentUser = null;
-    let currentShop = null;
     let publicProducts = [];
-
-    // NAVIGATION CONTROLLER
-    function navigateTo(viewId) {
-      const views = ['homeView', 'loginView', 'registerView', 'dashboardView'];
-      views.forEach(v => {
-        const el = document.getElementById(v);
-        if (el) el.classList.add('hidden');
-      });
-      const target = document.getElementById(viewId + 'View');
-      if (target) target.classList.remove('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // HELPER: Fetch Shop Data for Current User
-    async function fetchShopData(user) {
-      if (!user) return null;
-      try {
-        let shopDoc = await db.collection('shops').doc(user.uid).get();
-        if (shopDoc.exists) {
-          return { id: shopDoc.id, ...shopDoc.data() };
-        }
-        const qSnap = await db.collection('shops').where('ownerId', '==', user.uid).limit(1).get();
-        if (!qSnap.empty) {
-          const doc = qSnap.docs[0];
-          return { id: doc.id, ...doc.data() };
-        }
-      } catch (err) {
-        console.error("Error fetching shop data:", err);
-      }
-      return { id: user.uid, ownerId: user.uid, name: "متجري المحلي", region: "القصير المدينة", phone: "" };
-    }
-
-    // UPDATE UI BASED ON SHOP STATUS
-    function updateShopUI(shop) {
-      if (shop) {
-        currentShop = shop;
-        document.getElementById('navShopTitle').innerText = shop.name || 'متجري';
-        document.getElementById('dashShopName').innerText = shop.name || 'متجري';
-        document.getElementById('dashShopRegion').innerText = shop.region || 'القصير';
-        document.getElementById('dashShopPhone').innerText = `هاتف التواصل: ${shop.phone || ''}`;
-      }
-    }
-
-    // OPEN DASHBOARD WITH INTEGRITY CHECK
-    async function openVendorDashboard() {
-      if (!currentUser) {
-        navigateTo('login');
-        return;
-      }
-      if (!currentShop) {
-        const shop = await fetchShopData(currentUser);
-        updateShopUI(shop);
-      }
-      loadVendorProducts();
-      navigateTo('dashboard');
-    }
-
-    // AUTHENTICATION LISTENER
-    auth.onAuthStateChanged(async (user) => {
-      currentUser = user;
-      const guestNav = document.getElementById('guestNav');
-      const userNav = document.getElementById('userNav');
-
-      if (user) {
-        guestNav.classList.add('hidden');
-        userNav.classList.remove('hidden');
-
-        // Show default immediately while fetching
-        updateShopUI({ id: user.uid, name: "متجري", region: "القصير" });
-
-        const shop = await fetchShopData(user);
-        if (shop) updateShopUI(shop);
-        loadVendorProducts();
-      } else {
-        guestNav.classList.remove('hidden');
-        userNav.classList.add('hidden');
-        currentShop = null;
-      }
-    });
 
     // REAL-TIME LISTENER FOR PUBLIC PRODUCTS
     db.collection('products').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
@@ -518,188 +258,6 @@
           </div>
         </div>
       `).join('');
-    }
-
-    // LOGIN HANDLER
-    async function handleLogin(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btnLoginSubmit');
-      btn.disabled = true;
-      btn.innerText = 'جاري التحقق من الحساب...';
-
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-
-      try {
-        const cred = await auth.signInWithEmailAndPassword(email, password);
-        currentUser = cred.user;
-
-        // Force UI switch to user state
-        document.getElementById('guestNav').classList.add('hidden');
-        document.getElementById('userNav').classList.remove('hidden');
-
-        const shop = await fetchShopData(cred.user);
-        updateShopUI(shop);
-        loadVendorProducts();
-        navigateTo('dashboard');
-      } catch (err) {
-        alert('خطأ في تسجيل الدخول: ' + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = 'دخول الحساب';
-      }
-    }
-
-    // REGISTER HANDLER
-    async function handleRegister(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btnRegisterSubmit');
-      btn.disabled = true;
-      btn.innerText = 'جاري حفظ بيانات المتجر...';
-
-      const shopName = document.getElementById('regShopName').value.trim();
-      const region = document.getElementById('regRegion').value;
-      const phone = document.getElementById('regPhone').value.trim();
-
-      try {
-        let user = currentUser;
-
-        if (!user) {
-          const email = document.getElementById('regEmail').value.trim();
-          const password = document.getElementById('regPassword').value;
-
-          try {
-            const cred = await auth.createUserWithEmailAndPassword(email, password);
-            user = cred.user;
-            currentUser = user;
-          } catch (createErr) {
-            if (createErr.code === 'auth/email-already-in-use') {
-              alert('هذا البريد الإلكتروني مسجل لدينا بالفعل!\nسنتوجه بك الآن إلى صفحة "دخول صاحب محل" لتسجيل الدخول بحسابك القديم.');
-              document.getElementById('loginEmail').value = email;
-              navigateTo('login');
-              btn.disabled = false;
-              btn.innerText = 'تأكيد وإنشاء المتجر';
-              return;
-            } else {
-              throw createErr;
-            }
-          }
-        }
-
-        const newShopData = {
-          ownerId: user.uid,
-          name: shopName,
-          region: region,
-          phone: phone,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-
-        await db.collection('shops').doc(user.uid).set(newShopData, { merge: true });
-        updateShopUI({ id: user.uid, ...newShopData });
-
-        alert('تم حفظ متجرك بنجاح!');
-        loadVendorProducts();
-        navigateTo('dashboard');
-      } catch (err) {
-        alert('خطأ في التسجيل: ' + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = 'تأكيد وإنشاء المتجر';
-      }
-    }
-
-    // LOGOUT
-    function logout() {
-      auth.signOut();
-      currentUser = null;
-      currentShop = null;
-      navigateTo('home');
-    }
-
-    // VENDOR PRODUCTS LOADER
-    function loadVendorProducts() {
-      if (!currentUser) return;
-      db.collection('products').where('ownerId', '==', currentUser.uid).onSnapshot(snap => {
-        const vGrid = document.getElementById('vendorProductsGrid');
-        if (!vGrid) return;
-
-        if (snap.empty) {
-          vGrid.innerHTML = `<p class="col-span-full text-center text-slate-400 py-6 text-xs">لم تقم بإضافة أي منتجات لمتجرك بعد.</p>`;
-          return;
-        }
-
-        vGrid.innerHTML = snap.docs.map(doc => {
-          const item = doc.data();
-          return `
-            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 flex items-center justify-between gap-2">
-              <div>
-                <h4 class="font-bold text-slate-900 text-xs">${item.title}</h4>
-                <p class="text-xs text-emerald-700 font-extrabold">${Number(item.price).toLocaleString()} ل.س</p>
-              </div>
-              <button onclick="deleteProduct('${doc.id}')" class="text-red-600 hover:bg-red-100 p-1.5 rounded-lg text-xs font-bold transition">
-                حذف 🗑️
-              </button>
-            </div>
-          `;
-        }).join('');
-      }, err => {
-        console.error("Error loading vendor products:", err);
-      });
-    }
-
-    // MODAL CONTROLS
-    function openAddProductModal() { document.getElementById('addProductModal').classList.remove('hidden'); }
-    function closeAddProductModal() { document.getElementById('addProductModal').classList.add('hidden'); }
-
-    // SAVE PRODUCT
-    async function handleSaveProduct(e) {
-      e.preventDefault();
-      if (!currentUser) return alert('خطأ: لم يتم التعرف على حسابك');
-
-      const btn = document.getElementById('btnSaveProd');
-      btn.disabled = true;
-      btn.innerText = 'جاري النشر...';
-
-      const title = document.getElementById('prodTitle').value.trim();
-      const price = Number(document.getElementById('prodPrice').value);
-      const category = document.getElementById('prodCategory').value;
-      const image = document.getElementById('prodImage').value.trim();
-      const desc = document.getElementById('prodDesc').value.trim();
-
-      try {
-        await db.collection('products').add({
-          ownerId: currentUser.uid,
-          shopId: (currentShop && currentShop.id) ? currentShop.id : currentUser.uid,
-          shopName: (currentShop && currentShop.name) ? currentShop.name : 'متجري المحلي',
-          region: (currentShop && currentShop.region) ? currentShop.region : 'القصير المدينة',
-          phone: (currentShop && currentShop.phone) ? currentShop.phone : '',
-          title, price, category, image, desc,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        closeAddProductModal();
-        document.getElementById('prodTitle').value = '';
-        document.getElementById('prodPrice').value = '';
-        document.getElementById('prodImage').value = '';
-        document.getElementById('prodDesc').value = '';
-        alert('تم نشر المنتج بنجاح وظهر لجميع زوار موقع سوقنا!');
-      } catch (err) {
-        alert('حدث خطأ أثناء حفظ المنتج: ' + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = 'نشر للمشترين';
-      }
-    }
-
-    // DELETE PRODUCT
-    async function deleteProduct(id) {
-      if (confirm('هل أنت متأكد من إزالة هذا المنتج من متجرك؟')) {
-        try {
-          await db.collection('products').doc(id).delete();
-        } catch (err) {
-          alert('خطأ في الحذف: ' + err.message);
-        }
-      }
     }
   </script>
 </body>
