@@ -1,12 +1,78 @@
-// التحقق الفوري والصارم عند فتح الصفحة
-auth.onAuthStateChanged((user) => {
-  if (user) {
-    // المستخدم مسجل دخوله (أظهر لوحة التحكم)
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('admin-content').style.display = 'block';
-  } else {
-    // المستخدم غير مسجل دخول (اطرده فوراً قبل أن يرى أي شيء)
-    alert("عفواً، ممنوع الدخول بدون تسجيل حساب!");
-    window.location.href = "index.html"; // توجيه للخارج فوراً
-  }
-});
+  <script>
+    // ⚠️ بيانات مشروعك الحقيقية من Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyAm54wUGpO38iH2fcfopan-Mtb4a71_CY0",
+      authDomain: "souqna-76bed.firebaseapp.com",
+      projectId: "souqna-76bed",
+      storageBucket: "souqna-76bed.firebasestorage.app",
+      messagingSenderId: "615964030772",
+      appId: "1:615964030772:web:cc3219d83279d422e71761",
+      measurementId: "G-EP7QTEYFVE"
+    };
+
+    // تهيئة Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // 🔒 التحقق الصارم والمباشر من تسجيل الدخول
+    auth.onAuthStateChanged((user) => {
+      const loadingEl = document.getElementById('loading');
+      const contentEl = document.getElementById('admin-content');
+
+      if (user) {
+        // إذا كان المستخدم مسجلاً لدخوله بحساب صحيح
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (contentEl) contentEl.classList.remove('hidden');
+        document.getElementById('user-email').innerText = user.email;
+      } else {
+        // إذا كان زابوناً أو شخصاً غريباً (حتى من التصفح الخفي) -> طرد فوراً
+        alert("عفواً! لا يمكنك الوصول للوحة التحكم بدون تسجيل الدخول.");
+        window.location.href = "index.html"; // إعادة توجيهه للصفحة الرئيسية
+      }
+    });
+
+    // زر تسجيل الخروج
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      auth.signOut().then(() => {
+        window.location.href = "index.html";
+      });
+    });
+
+    // نموذج إضافة المنتج
+    document.getElementById('add-product-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const user = auth.currentUser;
+      if (!user) {
+        alert("غير مسموح بالنشر بدون تسجيل الدخول!");
+        return;
+      }
+
+      const name = document.getElementById('prod-name').value;
+      const price = document.getElementById('prod-price').value;
+      const image = document.getElementById('prod-image').value;
+      const desc = document.getElementById('prod-desc').value;
+
+      try {
+        await db.collection('products').add({
+          title: name,
+          price: Number(price),
+          image: image || 'https://via.placeholder.com/150',
+          desc: desc,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          ownerId: user.uid,
+          shopName: "متجري",
+          region: "القصير المدينة"
+        });
+
+        alert("تم نشر المنتج بنجاح وظهر في الصفحة الرئيسية!");
+        document.getElementById('add-product-form').reset();
+      } catch (error) {
+        console.error("خطأ في النشر:", error);
+        alert("حدث خطأ أثناء إضافة المنتج: " + error.message);
+      }
+    });
+  </script>
